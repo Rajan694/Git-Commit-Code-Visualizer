@@ -1,0 +1,61 @@
+{
+  "name": "where-was-i",
+  "displayName": "Where Was I?",
+  "description": "Visualizes the latest git commit code changes via soft background gradients.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.107.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "whereWasI.showMenu",
+        "title": "Where Was I: Settings Menu"
+      }
+    ],
+    "configuration": {
+      "title": "Where Was I?",
+      "properties": {
+        "whereWasI.showDiffChanges": {
+          "type": "boolean",
+          "default": true,
+          "description": "Toggle highlighting of recent git changes."
+        },
+        "whereWasI.diffColor": {
+          "type": "string",
+          "default": "#3f79c5",
+          "description": "Hex color code for highlighting changed lines (e.g., #3f79c5)."
+        },
+        "whereWasI.showYours": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, only highlight lines if you are the author of the latest commit for the file."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.9.0",
+    "@types/vscode": "^1.120.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.39.3",
+    "typescript": "^5.9.3"
+  }
+}
