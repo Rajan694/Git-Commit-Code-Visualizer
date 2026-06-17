@@ -31,7 +31,21 @@
         "whereWasI.diffColor": {
           "type": "string",
           "default": "#3f79c5",
-          "description": "Hex color code for highlighting changed lines (e.g., #3f79c5)."
+          "enum": [
+            "#3f79c5",
+            "#4caf50",
+            "#ff9800",
+            "#e91e63",
+            "#9c27b0"
+          ],
+          "enumDescriptions": [
+            "Ocean Blue",
+            "Mint Green",
+            "Amber",
+            "Rose",
+            "Violet"
+          ],
+          "description": "Choose a preset color for the highlight."
         },
         "whereWasI.showYours": {
           "type": "boolean",

@@ -4,6 +4,13 @@ import { promisify } from 'util';
 import * as path from 'path';
 
 const execAsync = promisify(exec);
+const PRESET_COLORS = [
+  { label: 'Ocean Blue', value: '#3f79c5' },
+  { label: 'Mint Green', value: '#4caf50' },
+  { label: 'Amber', value: '#ff9800' },
+  { label: 'Rose', value: '#e91e63' },
+  { label: 'Violet', value: '#9c27b0' },
+] as const;
 
 let decorationType: vscode.TextEditorDecorationType | undefined;
 let statusBarItem: vscode.StatusBarItem;
@@ -21,6 +28,8 @@ export function activate(context: vscode.ExtensionContext) {
   const menuCommand = vscode.commands.registerCommand('whereWasI.showMenu', async () => {
     const config = vscode.workspace.getConfiguration('whereWasI');
     const isEnabled = config.get<boolean>('showDiffChanges');
+    const showYours = config.get<boolean>('showYours');
+    const currentColor = config.get<string>('diffColor') || PRESET_COLORS[0].value;
 
     const items: vscode.QuickPickItem[] = [
       {
@@ -28,8 +37,12 @@ export function activate(context: vscode.ExtensionContext) {
         description: 'Toggle showDiffChanges',
       },
       {
+        label: `$(person) Show My Commits: ${showYours ? 'On' : 'Off'}`,
+        description: 'Toggle highlighting when last commit is yours',
+      },
+      {
         label: '$(symbol-color) Change Highlight Color',
-        description: 'Set a new hex color for diffColor',
+        description: `Current: ${currentColor}`,
       },
     ];
 
@@ -37,14 +50,25 @@ export function activate(context: vscode.ExtensionContext) {
 
     if (selection?.label.includes('Highlights')) {
       await config.update('showDiffChanges', !isEnabled, vscode.ConfigurationTarget.Global);
+      await refreshDecorations();
+    } else if (selection?.label.includes('My Commits')) {
+      await config.update('showYours', !showYours, vscode.ConfigurationTarget.Global);
+      await refreshDecorations();
     } else if (selection?.label.includes('Color')) {
-      const currentColor = config.get<string>('diffColor');
-      const newColor = await vscode.window.showInputBox({
-        prompt: 'Enter a Hex Color (e.g., #3f79c5)',
-        value: currentColor,
-      });
-      if (newColor) {
-        await config.update('diffColor', newColor, vscode.ConfigurationTarget.Global);
+      const colorPick = await vscode.window.showQuickPick(
+        PRESET_COLORS.map((color) => ({
+          label: color.label,
+          description: color.value,
+          value: color.value,
+        })),
+        {
+          placeHolder: 'Choose a highlight color',
+        },
+      );
+
+      if (colorPick) {
+        await config.update('diffColor', colorPick.value, vscode.ConfigurationTarget.Global);
+        await refreshDecorations();
       }
     }
   });
@@ -52,20 +76,17 @@ export function activate(context: vscode.ExtensionContext) {
 
   // 3. Listeners for Editor and Settings changes
   context.subscriptions.push(
-    vscode.window.onDidChangeActiveTextEditor(() => updateDecorations()),
-    vscode.workspace.onDidSaveTextDocument(() => updateDecorations()),
+    vscode.window.onDidChangeActiveTextEditor(() => void updateDecorations()),
+    vscode.workspace.onDidSaveTextDocument(() => void updateDecorations()),
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration('whereWasI')) {
-        updateStatusBarIcon();
-        updateDecorationStyle();
-        updateDecorations();
+        void refreshDecorations();
       }
     }),
   );
 
   // Initialize
-  updateDecorationStyle();
-  updateDecorations();
+  void refreshDecorations();
 }
 
 function updateStatusBarIcon() {
@@ -75,14 +96,19 @@ function updateStatusBarIcon() {
 
 function updateDecorationStyle() {
   if (decorationType) {
+    // Clear decorations on ALL visible editors before disposing the old type.
+    // If we dispose first, the old decorations become orphaned and stay visible.
+    for (const editor of vscode.window.visibleTextEditors) {
+      editor.setDecorations(decorationType, []);
+    }
     decorationType.dispose();
   }
 
   const config = vscode.workspace.getConfiguration('whereWasI');
-  const color = config.get<string>('diffColor') || '#3f79c5';
+  const color = config.get<string>('diffColor') || PRESET_COLORS[0].value;
 
   // Add some transparency (approx 30%) to the hex color so it acts as a soft highlight
-  const softColor = color.length === 7 ? color + '4D' : color;
+  const softColor = color.length === 7 ? `${color}4D` : color;
 
   decorationType = vscode.window.createTextEditorDecorationType({
     backgroundColor: softColor,
@@ -90,9 +116,23 @@ function updateDecorationStyle() {
   });
 }
 
+async function refreshDecorations() {
+  updateStatusBarIcon();
+  updateDecorationStyle();
+  await updateDecorations();
+}
+
 async function updateDecorations() {
-  const editor = vscode.window.activeTextEditor;
-  if (!editor || !decorationType) {
+  if (!decorationType) {
+    return;
+  }
+
+  const editors = vscode.window.visibleTextEditors;
+  await Promise.all(editors.map((editor) => updateDecorationsForEditor(editor)));
+}
+
+async function updateDecorationsForEditor(editor: vscode.TextEditor) {
+  if (!decorationType) {
     return;
   }
 
@@ -120,11 +160,10 @@ async function updateDecorations() {
 
     // Handle "showYours" logic
     const showYours = config.get<boolean>('showYours');
-    if (showYours) {
+    if (!showYours) {
       const { stdout: configOut } = await execAsync('git config user.name', { cwd });
       const currentAuthor = configOut.trim();
-      if (currentAuthor !== commitAuthor) {
-        // If authors don't match and showYours is true, do not highlight
+      if (currentAuthor === commitAuthor) {
         editor.setDecorations(decorationType, []);
         return;
       }
