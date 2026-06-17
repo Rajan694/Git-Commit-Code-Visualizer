@@ -18,61 +18,94 @@ let statusBarItem: vscode.StatusBarItem;
 export function activate(context: vscode.ExtensionContext) {
   // 1. Initialize Status Bar Item
   statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  statusBarItem.command = 'whereWasI.showMenu';
+  statusBarItem.command = 'whereWasI.showInfoPopup';
   statusBarItem.tooltip = 'Where Was I? Settings';
   statusBarItem.show();
   updateStatusBarIcon();
   context.subscriptions.push(statusBarItem);
 
-  // 2. Register Status Bar Menu Command
-  const menuCommand = vscode.commands.registerCommand('whereWasI.showMenu', async () => {
+  // 2. Register Status Bar Info Popup Command
+  const infoCommand = vscode.commands.registerCommand('whereWasI.showInfoPopup', async () => {
     const config = vscode.workspace.getConfiguration('whereWasI');
     const isEnabled = config.get<boolean>('showDiffChanges');
     const showYours = config.get<boolean>('showYours');
     const currentColor = config.get<string>('diffColor') || PRESET_COLORS[0].value;
 
-    const items: vscode.QuickPickItem[] = [
-      {
-        label: `$(eye) ${isEnabled ? 'Disable' : 'Enable'} Highlights`,
-        description: 'Toggle showDiffChanges',
-      },
-      {
-        label: `$(person) Show My Commits: ${showYours ? 'On' : 'Off'}`,
-        description: 'Toggle highlighting when last commit is yours',
-      },
-      {
-        label: '$(symbol-color) Change Highlight Color',
-        description: `Current: ${currentColor}`,
-      },
-    ];
-
-    const selection = await vscode.window.showQuickPick(items, { placeHolder: 'Where Was I? Settings' });
-
-    if (selection?.label.includes('Highlights')) {
-      await config.update('showDiffChanges', !isEnabled, vscode.ConfigurationTarget.Global);
-      await refreshDecorations();
-    } else if (selection?.label.includes('My Commits')) {
-      await config.update('showYours', !showYours, vscode.ConfigurationTarget.Global);
-      await refreshDecorations();
-    } else if (selection?.label.includes('Color')) {
-      const colorPick = await vscode.window.showQuickPick(
-        PRESET_COLORS.map((color) => ({
-          label: color.label,
-          description: color.value,
-          value: color.value,
-        })),
-        {
-          placeHolder: 'Choose a highlight color',
-        },
-      );
-
-      if (colorPick) {
-        await config.update('diffColor', colorPick.value, vscode.ConfigurationTarget.Global);
+    const choice = await vscode.window.showInformationMessage(
+      'Where Was I Settings',
+      'Toggle Highlights',
+      'Toggle My Commits',
+      'Change Highlight Color',
+    );
+    switch (choice) {
+      case 'Toggle Highlights':
+        await config.update('showDiffChanges', !isEnabled, vscode.ConfigurationTarget.Global);
         await refreshDecorations();
+        break;
+      case 'Toggle My Commits':
+        await config.update('showYours', !showYours, vscode.ConfigurationTarget.Global);
+        await refreshDecorations();
+        break;
+      case 'Change Highlight Color': {
+        const colorPick = await vscode.window.showQuickPick(
+          PRESET_COLORS.map((color) => ({
+            label: color.label,
+            description: color.value,
+            value: color.value,
+          })),
+          { placeHolder: 'Choose a highlight color' },
+        );
+        if (colorPick) {
+          await config.update('diffColor', colorPick.value, vscode.ConfigurationTarget.Global);
+          await refreshDecorations();
+        }
+        break;
       }
     }
   });
-  context.subscriptions.push(menuCommand);
+  context.subscriptions.push(infoCommand);
+
+  // Helper to generate the HTML content for the popover
+  function getWebviewContent(): string {
+    const config = vscode.workspace.getConfiguration('whereWasI');
+    const isEnabled = config.get<boolean>('showDiffChanges');
+    const showYours = config.get<boolean>('showYours');
+    const currentColor = config.get<string>('diffColor') || PRESET_COLORS[0].value;
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: var(--vscode-editor-font-family, sans-serif); padding: 10px; }
+    button { margin: 5px 0; width: 100%; padding: 5px; }
+  </style>
+</head>
+<body>
+  <button id="highlights">${isEnabled ? 'Disable' : 'Enable'} Highlights</button>
+  <button id="yours">Show My Commits: ${showYours ? 'On' : 'Off'}</button>
+  <button id="color">Change Highlight Color (Current: ${currentColor})</button>
+  <script>
+    const vscode = acquireVsCodeApi();
+    document.getElementById('highlights').addEventListener('click', () => {
+      vscode.postMessage({ command: 'toggleHighlights' });
+    });
+    document.getElementById('yours').addEventListener('click', () => {
+      vscode.postMessage({ command: 'toggleYours' });
+    });
+    document.getElementById('color').addEventListener('click', () => {
+      vscode.postMessage({ command: 'changeColor' });
+    });
+    // Close the panel when it loses focus
+    window.addEventListener('blur', () => {
+      vscode.postMessage({ command: 'dispose' });
+    });
+  </script>
+</body>
+</html>`;
+  }
+
+  // Keep a reference to the panel so we can reuse or dispose it
+  let popoverPanel: vscode.WebviewPanel | undefined;
 
   // 3. Listeners for Editor and Settings changes
   context.subscriptions.push(
@@ -96,8 +129,6 @@ function updateStatusBarIcon() {
 
 function updateDecorationStyle() {
   if (decorationType) {
-    // Clear decorations on ALL visible editors before disposing the old type.
-    // If we dispose first, the old decorations become orphaned and stay visible.
     for (const editor of vscode.window.visibleTextEditors) {
       editor.setDecorations(decorationType, []);
     }
