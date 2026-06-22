@@ -3,6 +3,10 @@
   "displayName": "Where Was I?",
   "description": "Visualizes the latest git commit code changes via soft background gradients.",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Rajan694/Git-Commit-Code-Visualizer.git"
+  },
   "engines": {
     "vscode": "^1.107.0"
   },
@@ -18,6 +22,17 @@
       {
         "command": "whereWasI.showMenu",
         "title": "Where Was I: Settings Menu"
+      },
+      {
+        "command": "whereWasI.toggleHighlights",
+        "title": "Where Was I: Toggle Highlights"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "whereWasI.toggleHighlights",
+        "key": "ctrl+alt+w",
+        "mac": "ctrl+alt+w"
       }
     ],
     "configuration": {
@@ -66,7 +81,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.9.0",
-    "@types/vscode": "^1.120.0",
+    "@types/vscode": "^1.107.0",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "eslint": "^9.39.3",
