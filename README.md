@@ -1,6 +1,6 @@
 # Where Was I?
 
-"Where Was I?" is a Visual Studio Code extension that helps you quickly identify recent code changes by visualizing the latest git commit differences using soft background gradients directly in your editor. 
+"Where Was I?" is a Visual Studio Code extension that helps you quickly identify recent code changes by visualizing the latest git commit differences using soft background gradients directly in your editor.
 
 It's perfect for jumping back into a project and instantly seeing what you (or others) were last working on.
 
@@ -8,9 +8,14 @@ It's perfect for jumping back into a project and instantly seeing what you (or o
 
 - **Inline Git Highlights**: Visually highlights lines modified in the most recent commit for the currently open file.
 - **Customizable Colors**: Choose from multiple preset highlight colors (Ocean Blue, Mint Green, Amber, Rose, Violet) to suit your theme.
-- **Filter by Author**: An optional "Show Yours" setting restricts highlights to only show up if *you* were the author of the latest commit, helping you focus strictly on your own recent work.
+- **Filter by Author**: An optional "Show Yours" setting restricts highlights to only show up if _you_ were the author of the latest commit, helping you focus strictly on your own recent work.
 - **Status Bar Integration**: Provides a convenient status bar item indicating whether highlights are currently enabled or disabled.
-- **Quick Settings Menu**: Click the status bar item to open a quick-access popup menu where you can toggle highlights, toggle the author filter, or change the highlight color on the fly.
+- **Quick Settings Menu**: Click the status bar item to open a quick-access popup menu where you can show/hide highlights, show/hide your own commits, or change the highlight color on the fly.
+- **Keyboard Shortcut**: Press `Ctrl+Alt+W` to instantly toggle highlights on/off from anywhere in the editor, with a brief status bar confirmation.
+
+## Usage
+
+![Usage demo](assets/usage.gif)
 
 ## Extension Settings
 
@@ -20,9 +25,16 @@ This extension contributes the following configurable settings:
 - `whereWasI.diffColor`: Select the soft background color used for highlighting changed lines. (Default: `#3f79c5` - Ocean Blue)
 - `whereWasI.showYours`: When enabled, only highlights changes if your configured git username matches the author of the file's latest commit. (Default: `false`)
 
+## Keyboard Shortcuts
+
+| Shortcut     | Action                             |
+| ------------ | ---------------------------------- |
+| `Ctrl+Alt+W` | Toggle highlight visibility on/off |
+
 ## Commands
 
-- `Where Was I: Settings Menu` (`whereWasI.showMenu`): Opens the interactive quick-pick menu to adjust your highlight preferences without needing to open the VS Code settings UI.
+- `Where Was I: Settings Menu` (`whereWasI.showInfoPopup`): Opens the interactive settings menu to show/hide highlights, show/hide your own commits, or change the highlight color.
+- `Where Was I: Toggle Highlights` (`whereWasI.toggleHighlights`): Directly toggles the `showDiffChanges` setting on/off. Also accessible via `Ctrl+Alt+W`.
 
 ## Requirements
 
@@ -31,4 +43,5 @@ This extension contributes the following configurable settings:
 ## Release Notes
 
 ### 0.0.1
+
 - Initial release! Core highlighting features, customizable colors, and status bar integration.
