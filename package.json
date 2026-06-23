@@ -4,6 +4,7 @@
   "description": "Visualizes the latest git commit code changes via soft background gradients.",
   "icon": "assets/extension_icon.ico",
   "version": "0.0.1",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Rajan694/Git-Commit-Code-Visualizer.git"

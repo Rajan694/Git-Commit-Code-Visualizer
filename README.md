@@ -1,5 +1,7 @@
 # Where Was I?
 
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 "Where Was I?" is a Visual Studio Code extension that helps you quickly identify recent code changes by visualizing the latest git commit differences using soft background gradients directly in your editor.
 
 It's perfect for jumping back into a project and instantly seeing what you (or others) were last working on.
