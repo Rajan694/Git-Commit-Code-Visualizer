@@ -117,6 +117,7 @@ async function updateDecorationsForEditor(editor: vscode.TextEditor) {
     editor.setDecorations(decorationType, decorations);
   } catch (error) {
     // Fail silently - file might not be tracked by git, git might not be installed, etc.
+    console.error(error);
     editor.setDecorations(decorationType, []);
   }
 }

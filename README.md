@@ -13,6 +13,10 @@ It's perfect for jumping back into a project and instantly seeing what you (or o
 - **Quick Settings Menu**: Click the status bar item to open a quick-access popup menu where you can show/hide highlights, show/hide your own commits, or change the highlight color on the fly.
 - **Keyboard Shortcut**: Press `Ctrl+Alt+W` to instantly toggle highlights on/off from anywhere in the editor, with a brief status bar confirmation.
 
+## Usage
+
+![Usage demo](assets/usage.gif)
+
 ## Extension Settings
 
 This extension contributes the following configurable settings:

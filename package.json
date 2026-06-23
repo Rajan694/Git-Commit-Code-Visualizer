@@ -2,6 +2,7 @@
   "name": "where-was-i",
   "displayName": "Where Was I?",
   "description": "Visualizes the latest git commit code changes via soft background gradients.",
+  "icon": "assets/extension_icon.ico",
   "version": "0.0.1",
   "repository": {
     "type": "git",
