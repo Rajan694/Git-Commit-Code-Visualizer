@@ -3,7 +3,7 @@
   "displayName": "Where Was I?",
   "description": "Visualizes the latest git commit code changes via soft background gradients.",
   "icon": "assets/extension_icon.ico",
-  "publisher": "Rajan694",
+  "publisher": "rajan694",
   "version": "0.0.1",
   "license": "MIT",
   "repository": {
