@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Type-check, lint and bundle.
+      - run: npm run compile
+
+      # Extension tests run inside a downloaded VS Code; Linux needs a virtual display.
+      - name: Test
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npm test
+      - name: Test
+        if: runner.os != 'Linux'
+        run: npm test
+
+      # Build the .vsix with both package scripts, so both stay working.
+      - name: Package (bash)
+        if: runner.os != 'Windows'
+        run: bash scripts/package.sh
+      - name: Package (PowerShell)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/package.ps1
+
+      - name: Upload .vsix
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v7
+        with:
+          name: vsix
+          path: releases/*.vsix
+          if-no-files-found: error

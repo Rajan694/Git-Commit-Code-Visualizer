@@ -1,0 +1,82 @@
+# "Run workflow" button on the Actions tab (or: gh workflow run release.yml -f version=minor).
+# Runs scripts/publish.sh: version bump, changelog, tag, GitHub release,
+# VS Code Marketplace, Open VSX.
+#
+# One-time setup (details in RELEASING.md):
+#   - VS Code Marketplace: add a Trusted Publishing policy for this repository and
+#     the workflow file "release.yml" at https://marketplace.visualstudio.com/manage
+#   - Open VSX: add the repository secret OVSX_PAT for the first release. Afterwards register
+#     a trusted publisher at https://open-vsx.org/user-settings/trusted-publishers and delete
+#     the secret (a token always takes precedence over trusted publishing).
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "patch, minor, major, an exact X.Y.Z, or current"
+        required: true
+        default: patch
+        type: string
+      pre-release:
+        description: Publish as a pre-release
+        type: boolean
+        default: false
+      github:
+        description: Create a GitHub release
+        type: boolean
+        default: true
+      marketplace:
+        description: Publish to the VS Code Marketplace
+        type: boolean
+        default: true
+      openvsx:
+        description: Publish to Open VSX
+        type: boolean
+        default: true
+
+permissions:
+  contents: write   # push the release commit and tag, create the GitHub release
+  id-token: write   # trusted publishing (OIDC) to the VS Code Marketplace and Open VSX
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Publish
+        env:
+          VERSION: ${{ inputs.version }}
+          PRE_RELEASE: ${{ inputs.pre-release }}
+          GITHUB_TARGET: ${{ inputs.github }}
+          MARKETPLACE_TARGET: ${{ inputs.marketplace }}
+          OPENVSX_TARGET: ${{ inputs.openvsx }}
+          # Marketplace uses trusted publishing (OIDC), so no VSCE_PAT here.
+          # Open VSX uses OVSX_PAT while the secret exists, otherwise trusted publishing.
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          args=("$VERSION" --yes)
+          [ "$PRE_RELEASE" = true ] && args+=(--pre-release)
+          [ "$GITHUB_TARGET" = true ] || args+=(--skip-github)
+          [ "$MARKETPLACE_TARGET" = true ] || args+=(--skip-marketplace)
+          [ "$OPENVSX_TARGET" = true ] || args+=(--skip-openvsx)
+          bash scripts/publish.sh "${args[@]}"

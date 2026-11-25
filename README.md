@@ -42,8 +42,26 @@ This extension contributes the following configurable settings:
 
 - **Git**: The extension relies on the `git` command-line tool being installed and accessible in your system's PATH. It functions by analyzing the local git history of your repository workspace.
 
+## Installation
+
+Install **Where Was I?** from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=rajan694.where-was-i) or [Open VSX](https://open-vsx.org/extension/rajan694/where-was-i), or from a `.vsix` file attached to a [GitHub release](https://github.com/Rajan694/Git-Commit-Code-Visualizer/releases): see [INSTALL_FROM_VSIX.md](INSTALL_FROM_VSIX.md).
+
 ## Release Notes
 
-### 0.0.1
+See [CHANGELOG.md](CHANGELOG.md).
 
-- Initial release! Core highlighting features, customizable colors, and status bar integration.
+## Development
+
+Requires Node.js 22 or later.
+
+```bash
+npm install
+npm run compile     # type-check, lint, bundle to dist/
+npm test            # extension tests in a downloaded VS Code
+```
+
+Press `F5` in VS Code to open a window with the extension loaded. Packaging and publishing are described in [RELEASING.md](RELEASING.md).
+
+## License
+
+[MIT](LICENSE)

@@ -1,9 +1,26 @@
+# Everything listed here is left out of the .vsix.
+# The bundle in dist/ has no runtime dependencies, so node_modules is excluded too.
+# README images (usage.gif) are linked from GitHub by vsce, so they are not packaged.
 .vscode/**
 .vscode-test/**
+.github/**
 src/**
+out/**
+docs/**
+scripts/**
+releases/**
+node_modules/**
 .gitignore
+.gitattributes
+.env
+.env.*
 .yarnrc
+esbuild.js
+RELEASING.md
+INSTALL_FROM_VSIX.md
+.nvmrc
 vsc-extension-quickstart.md
+assets/usage.gif
 **/tsconfig.json
 **/eslint.config.mjs
 **/*.map

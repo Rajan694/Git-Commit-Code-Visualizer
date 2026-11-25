@@ -1,15 +1,22 @@
 import * as assert from 'assert';
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 import * as vscode from 'vscode';
-// import * as myExtension from '../../extension';
 
-suite('Extension Test Suite', () => {
-	vscode.window.showInformationMessage('Start all tests.');
+const EXTENSION_ID = 'rajan694.where-was-i';
 
-	test('Sample test', () => {
-		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+suite('Where Was I?', () => {
+	test('is installed', () => {
+		assert.ok(vscode.extensions.getExtension(EXTENSION_ID));
+	});
+
+	test('activates and registers every contributed command', async () => {
+		const extension = vscode.extensions.getExtension(EXTENSION_ID)!;
+		await extension.activate();
+		assert.strictEqual(extension.isActive, true);
+
+		const registered = await vscode.commands.getCommands(true);
+		const contributed: { command: string }[] = extension.packageJSON.contributes.commands;
+		for (const { command } of contributed) {
+			assert.ok(registered.includes(command), `${command} is contributed in package.json but not registered`);
+		}
 	});
 });

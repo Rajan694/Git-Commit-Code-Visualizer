@@ -3,3 +3,9 @@ dist
 node_modules
 .vscode-test/
 *.vsix
+releases/
+
+# Publishing tokens (see RELEASING.md). Never commit these.
+.env
+.env.*
+!.env.example

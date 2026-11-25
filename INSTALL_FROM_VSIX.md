@@ -1,10 +1,10 @@
 # Install from the `.vsix` file
 
-Use this file if you want to install the extension directly in VS Code without using the marketplace.
+Use this if you want to install Where Was I? without the VS Code Marketplace or Open VSX, for example to try a version before it is published there.
 
 ## Download the release asset
 
-1. Open the GitHub release for this extension.
+1. Open the [releases page](https://github.com/Rajan694/Git-Commit-Code-Visualizer/releases) and pick a version.
 2. Download the `.vsix` file from the release assets.
 3. Save the file somewhere easy to find, such as your `Downloads` folder.
 
@@ -24,10 +24,10 @@ Use this file if you want to install the extension directly in VS Code without u
 If you prefer the terminal, run:
 
 ```bash
-code --install-extension /path/to/your-extension.vsix
+code --install-extension /path/to/where-was-i-X.Y.Z.vsix
 ```
 
-Replace `/path/to/your-extension.vsix` with the actual file path.
+Replace `/path/to/where-was-i-X.Y.Z.vsix` with the actual file path.
 
 ## Verify the installation
 
