@@ -7,6 +7,8 @@ Write new entries under **[Unreleased]**. The publish script moves them under th
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-25
+
 - Fixed: **Where Was I: Settings Menu** in the Command Palette failed with "command not found". It now opens the settings menu.
 - Smaller download: the extension is bundled into one file with esbuild, and the usage GIF is no longer packaged.
 - New releases are published to GitHub Releases, the VS Code Marketplace and Open VSX together.

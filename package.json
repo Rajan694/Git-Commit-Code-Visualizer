@@ -4,7 +4,7 @@
   "description": "Visualizes the latest git commit code changes via soft background gradients.",
   "icon": "assets/extension_icon.ico",
   "publisher": "rajan694",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "license": "MIT",
   "repository": {
     "type": "git",
