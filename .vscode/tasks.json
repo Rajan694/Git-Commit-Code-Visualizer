@@ -45,7 +45,7 @@
 					}
 				],
 				"background": {
-					"activeBegin": "^\\[watch\\] build started",
+					"beginsPattern": "^\\[watch\\] build started",
 					"endsPattern": "^\\[watch\\] build finished"
 				}
 			}
