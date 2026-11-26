@@ -5,7 +5,6 @@ node_modules
 *.vsix
 releases/
 
-# Publishing tokens (see RELEASING.md). Never commit these.
+# Publishing tokens. Never commit these.
 .env
 .env.*
-!.env.example

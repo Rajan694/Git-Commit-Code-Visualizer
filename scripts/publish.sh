@@ -17,7 +17,7 @@
 #   --dry-run           Build the .vsix for the new version, then put the files back; publish nothing
 #   -y, --yes           Don't ask for confirmation (required when not run in a terminal)
 #
-# Credentials (see RELEASING.md):
+# Credentials:
 #   GitHub       gh CLI login ("gh auth login") or GH_TOKEN
 #   Marketplace  trusted publishing (OIDC) when run by the Release workflow on GitHub,
 #                otherwise VSCE_PAT (global Azure DevOps PATs stop working on 1 Dec 2026)
@@ -150,9 +150,9 @@ if [ "$SKIP_GITHUB" = 0 ]; then
     problems="$problems\n  - no 'origin' remote: create the GitHub repository and add it as origin (or pass --skip-github)"
 fi
 [ "$SKIP_MARKETPLACE" = 1 ] || [ "$OIDC" = 1 ] || [ -n "${VSCE_PAT:-}" ] ||
-  problems="$problems\n  - no VS Code Marketplace credentials: run the Release workflow on GitHub, or set VSCE_PAT; see RELEASING.md (or pass --skip-marketplace)"
+  problems="$problems\n  - no VS Code Marketplace credentials: run the Release workflow on GitHub, or set VSCE_PAT (or pass --skip-marketplace)"
 [ "$SKIP_OPENVSX" = 1 ] || [ "$OIDC" = 1 ] || [ -n "${OVSX_PAT:-}" ] ||
-  problems="$problems\n  - OVSX_PAT is not set; see RELEASING.md (or pass --skip-openvsx)"
+  problems="$problems\n  - OVSX_PAT is not set (or pass --skip-openvsx)"
 if [ -n "$problems" ]; then
   printf 'Release prerequisites are missing:%b\n' "$problems" >&2
   if [ "$DRY_RUN" = 1 ]; then warn "continuing because this is a dry run"; else exit 1; fi

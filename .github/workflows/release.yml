@@ -2,7 +2,7 @@
 # Runs scripts/publish.sh: version bump, changelog, tag, GitHub release,
 # VS Code Marketplace, Open VSX.
 #
-# One-time setup (details in RELEASING.md):
+# One-time setup:
 #   - VS Code Marketplace: add a Trusted Publishing policy for this repository and
 #     the workflow file "release.yml" at https://marketplace.visualstudio.com/manage
 #   - Open VSX: add the repository secret OVSX_PAT for the first release. Afterwards register

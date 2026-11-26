@@ -72,7 +72,7 @@
         "whereWasI.showYours": {
           "type": "boolean",
           "default": false,
-          "description": "If true, only highlight lines if you are the author of the latest commit for the file."
+          "description": "Also highlight files whose latest commit was authored by you (your git user.name). When off, only changes by others are highlighted."
         }
       }
     }
